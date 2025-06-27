@@ -39,6 +39,34 @@ export default function ArticlePage() {
         if (!foundArticle) {
           throw new Error("Article not found");
         }
+
+        // Check if content is truncated (contains "+800 characters" or is too short)
+        if (foundArticle.content && 
+            (foundArticle.content.length < 500)) {
+          
+          try {
+            // Try to fetch full content from the original URL
+            const contentResponse = await fetch("/api/article-content", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                url: foundArticle.url,
+              }),
+            });
+
+            if (contentResponse.ok) {
+              const contentData = await contentResponse.json();
+              if (contentData.content) {
+                foundArticle.content = contentData.content;
+              }
+            }
+          } catch (contentError) {
+            console.log("Failed to fetch full content:", contentError);
+            // Continue with truncated content
+          }
+        }
         
         setArticle(foundArticle);
       } catch (err) {

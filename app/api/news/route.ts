@@ -2,36 +2,61 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const apiKey = process.env.NEWS_API_KEY;
-    console.log("apiKey", apiKey);
-    if (!apiKey) {
-      throw new Error("NEWS_API_KEY environment variable is not set");
+    const apiKey = process.env.NEWSAPI_API_KEY;
+    
+    // Try NewsAPI.org first if API key is available
+    if (apiKey) {
+      try {
+        const response = await fetch(
+          `https://newsapi.org/v2/top-headlines?country=us&pageSize=10&apiKey=${apiKey}`
+        );
+        
+        if (response.ok) {
+          const data = await response.json();
+          
+          const articles = data.articles?.map((article: any) => ({
+            id: article.url,
+            title: article.title,
+            description: article.description,
+            url: article.url,
+            image: article.urlToImage || "/placeholder-news.svg",
+            source: article.source?.name || "Unknown Source",
+            publishedAt: article.publishedAt,
+            content: article.content
+          })) || [];
+          
+          return NextResponse.json(articles);
+        }
+      } catch (error) {
+        console.log("NewsAPI.org failed, trying GNews:", error);
+      }
     }
 
-    // Fetch latest news articles from NewsAPI.org
-    const response = await fetch(
-      `https://newsapi.org/v2/top-headlines?country=us&pageSize=10&apiKey=${apiKey}`
+    // Fallback to GNews API (free tier with full content)
+    const gnewsApiKey = process.env.GNEWS_API_KEY;
+    const gnewsResponse = await fetch(
+      `https://gnews.io/api/v4/top-headlines?lang=en&country=us&max=10&apikey=${gnewsApiKey}`
     );
     
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    if (!gnewsResponse) {
+      throw new Error(`HTTP error! status: 500}`);
     }
     
-    const data = await response.json();
+    const gnewsData = await gnewsResponse.json();
     
-    // Transform the data to match our expected format
-    const articles = data.articles?.map((article: any) => ({
-      id: article.url, // Using URL as ID since NewsAPI doesn't provide a unique ID
+    const articles = gnewsData.articles?.map((article: any) => ({
+      id: article.url,
       title: article.title,
       description: article.description,
       url: article.url,
-      image: article.urlToImage || "/placeholder-news.svg",
+      image: article.image || "/placeholder-news.svg",
       source: article.source?.name || "Unknown Source",
       publishedAt: article.publishedAt,
-      content: article.content
+      content: article.content || article.description // GNews provides full content
     })) || [];
     
     return NextResponse.json(articles);
+    
   } catch (error) {
     console.error("Error fetching news:", error);
     return NextResponse.json(
