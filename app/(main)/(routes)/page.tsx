@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Article } from "../../../types/news";
-
+import SearchIcon from '@mui/icons-material/Search';
 export default function HomePage() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
@@ -156,7 +156,7 @@ export default function HomePage() {
                   placeholder="Search for news articles..."
                   className="w-full px-4 py-3 pl-12 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
                 />
-                <svg
+                {/* <svg
                   className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
                   fill="none"
                   stroke="currentColor"
@@ -168,7 +168,8 @@ export default function HomePage() {
                     strokeWidth={2}
                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                   />
-                </svg>
+                </svg> */}
+                <SearchIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               </div>
               <button
                 type="submit"
@@ -234,15 +235,7 @@ export default function HomePage() {
                 className="group"
               >
                 <article className="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden transform hover:-translate-y-2 border border-gray-100 dark:border-gray-700 h-[500px] flex flex-col">
-                  {/* Featured Article Badge */}
-                  {index === 0 && !isSearching && (
-                    <div className="absolute top-4 left-4 z-10">
-                      <span className="bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                        FEATURED
-                      </span>
-                    </div>
-                  )}
-                  
+                 
                   {/* Image Container */}
                   <div className="relative h-48 w-full overflow-hidden flex-shrink-0">
                     <Image
