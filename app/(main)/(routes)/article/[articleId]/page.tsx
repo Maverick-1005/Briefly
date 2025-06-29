@@ -26,49 +26,101 @@ export default function ArticlePage() {
         setLoading(true);
         const articleId = decodeURIComponent(params.articleId as string);
         
-        // Fetch all articles to find the specific one
-        const response = await fetch("/api/news");
-        
-        if (!response.ok) {
-          throw new Error("Failed to fetch articles");
-        }
-        
-        const articles = await response.json();
-        const foundArticle = articles.find((a: Article) => a.id === articleId);
-        
-        if (!foundArticle) {
-          throw new Error("Article not found");
-        }
-
-        // Check if content is truncated (contains "+800 characters" or is too short)
-        if (foundArticle.content && 
-            (foundArticle.content.length < 500)) {
+        // First, try to fetch from the main news feed
+        try {
+          const response = await fetch("/api/news");
           
-          try {
-            // Try to fetch full content from the original URL
-            const contentResponse = await fetch("/api/article-content", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                url: foundArticle.url,
-              }),
-            });
+          if (response.ok) {
+            const articles = await response.json();
+            const foundArticle = articles.find((a: Article) => a.id === articleId);
+            
+            if (foundArticle) {
+              // Check if content is truncated and try to fetch full content
+              if (foundArticle.content && foundArticle.content.length < 500) {
+                try {
+                  const contentResponse = await fetch("/api/article-content", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                      url: foundArticle.url,
+                    }),
+                  });
 
-            if (contentResponse.ok) {
-              const contentData = await contentResponse.json();
-              if (contentData.content) {
-                foundArticle.content = contentData.content;
+                  if (contentResponse.ok) {
+                    const contentData = await contentResponse.json();
+                    if (contentData.content) {
+                      foundArticle.content = contentData.content;
+                    }
+                  }
+                } catch (contentError) {
+                  console.log("Failed to fetch full content:", contentError);
+                }
               }
+              
+              setArticle(foundArticle);
+              return;
             }
-          } catch (contentError) {
-            console.log("Failed to fetch full content:", contentError);
-            // Continue with truncated content
           }
+        } catch (error) {
+          console.log("Failed to fetch from main feed:", error);
         }
         
-        setArticle(foundArticle);
+        // If not found in main feed, check localStorage for search results
+        try {
+          const searchResults = localStorage.getItem('searchResults');
+          if (searchResults) {
+            const articles = JSON.parse(searchResults);
+            const foundArticle = articles.find((a: Article) => a.id === articleId);
+            
+            if (foundArticle) {
+              // Check if content is truncated and try to fetch full content
+              if (foundArticle.content && foundArticle.content.length < 500) {
+                try {
+                  const contentResponse = await fetch("/api/article-content", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                      url: foundArticle.url,
+                    }),
+                  });
+
+                  if (contentResponse.ok) {
+                    const contentData = await contentResponse.json();
+                    if (contentData.content) {
+                      foundArticle.content = contentData.content;
+                    }
+                  }
+                } catch (contentError) {
+                  console.log("Failed to fetch full content:", contentError);
+                }
+              }
+              
+              setArticle(foundArticle);
+              return;
+            }
+          }
+        } catch (error) {
+          console.log("Failed to fetch from localStorage:", error);
+        }
+        
+        // If still not found, create a basic article from the URL
+        const basicArticle = {
+          id: articleId,
+          title: extractTitleFromUrl(articleId),
+          description: "Article content available at the source",
+          url: articleId,
+          image: "/placeholder-news.svg",
+          source: extractDomainFromUrl(articleId),
+          publishedAt: new Date().toISOString(),
+          content: "Content available at the original source. Click 'Read Full Article' to view the complete content."
+        };
+        
+        setArticle(basicArticle);
+        
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
       } finally {
@@ -125,6 +177,40 @@ export default function ArticlePage() {
       hour: "2-digit",
       minute: "2-digit",
     });
+  };
+
+  // Helper function to extract domain from URL
+  const extractDomainFromUrl = (url: string): string => {
+    try {
+      const urlObj = new URL(url);
+      return urlObj.hostname.replace('www.', '');
+    } catch {
+      return "Unknown Source";
+    }
+  };
+
+  // Helper function to extract title from URL
+  const extractTitleFromUrl = (url: string): string => {
+    try {
+      const urlObj = new URL(url);
+      const pathname = urlObj.pathname;
+      const segments = pathname.split('/').filter(segment => segment.length > 0);
+      
+      if (segments.length > 0) {
+        const lastSegment = segments[segments.length - 1];
+        // Convert URL-friendly format to readable title
+        return lastSegment
+          .replace(/[-_]/g, ' ')
+          .replace(/\.[^/.]+$/, '') // Remove file extension
+          .split(' ')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
+      }
+      
+      return "Article";
+    } catch {
+      return "Article";
+    }
   };
 
   if (loading) {

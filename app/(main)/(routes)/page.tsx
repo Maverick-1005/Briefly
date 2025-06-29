@@ -29,6 +29,16 @@ export default function HomePage() {
       
       const data = await response.json();
       setArticles(data);
+      
+      // Store search results in localStorage if this is a search
+      if (query && data.length > 0) {
+        localStorage.setItem('searchResults', JSON.stringify(data));
+        localStorage.setItem('searchQuery', query);
+      } else if (!query) {
+        // Clear search results when fetching main feed
+        localStorage.removeItem('searchResults');
+        localStorage.removeItem('searchQuery');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
@@ -223,7 +233,7 @@ export default function HomePage() {
                 href={`/article/${encodeURIComponent(article.id)}`}
                 className="group"
               >
-                <article className="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden transform hover:-translate-y-2 border border-gray-100 dark:border-gray-700">
+                <article className="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden transform hover:-translate-y-2 border border-gray-100 dark:border-gray-700 h-[500px] flex flex-col">
                   {/* Featured Article Badge */}
                   {index === 0 && !isSearching && (
                     <div className="absolute top-4 left-4 z-10">
@@ -234,7 +244,7 @@ export default function HomePage() {
                   )}
                   
                   {/* Image Container */}
-                  <div className="relative h-48 w-full overflow-hidden">
+                  <div className="relative h-48 w-full overflow-hidden flex-shrink-0">
                     <Image
                       src={article.image}
                       alt={article.title}
@@ -250,16 +260,16 @@ export default function HomePage() {
                   </div>
                   
                   {/* Content */}
-                  <div className="p-6">
+                  <div className="p-6 flex flex-col flex-1">
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">
                       {article.title}
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3">
+                    <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3 flex-1">
                       {article.description}
                     </p>
                     
                     {/* Meta Information */}
-                    <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                    <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-4">
                       <div className="flex items-center space-x-2">
                         <span className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 px-2 py-1 rounded-full font-medium">
                           {article.source}
@@ -271,7 +281,7 @@ export default function HomePage() {
                     </div>
                     
                     {/* Read More Button */}
-                    <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                    <div className="pt-4 border-t border-gray-100 dark:border-gray-700 mt-auto">
                       <span className="text-blue-600 dark:text-blue-400 font-medium text-sm group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors duration-200">
                         Read More →
                       </span>
