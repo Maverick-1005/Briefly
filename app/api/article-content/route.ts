@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     if (!response.ok) {
       throw new Error(`Failed to fetch article: ${response.status}`);
     }
-
+    console.log("added logs")
     const html = await response.text();
     
     // Simple content extraction (you might want to use a proper HTML parser)
