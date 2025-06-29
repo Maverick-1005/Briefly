@@ -9,28 +9,48 @@ export default function HomePage() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+
+  const fetchNews = async (query?: string) => {
+    try {
+      setLoading(true);
+      setIsSearching(!!query);
+      
+      const url = query 
+        ? `/api/news?query=${encodeURIComponent(query)}`
+        : "/api/news";
+        
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error("Failed to fetch news articles");
+      }
+      
+      const data = await response.json();
+      setArticles(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchNews = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch("/api/news");
-        
-        if (!response.ok) {
-          throw new Error("Failed to fetch news articles");
-        }
-        
-        const data = await response.json();
-        setArticles(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchNews();
   }, []);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      fetchNews(searchQuery.trim());
+    }
+  };
+
+  const handleClearSearch = () => {
+    setSearchQuery("");
+    fetchNews();
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -49,7 +69,7 @@ export default function HomePage() {
           {/* Header */}
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
-              Latest News
+              Briefly
             </h1>
             <p className="text-gray-600 dark:text-gray-300 text-lg">
               Stay updated with the most recent headlines
@@ -75,7 +95,7 @@ export default function HomePage() {
           {/* Header */}
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
-              Latest News
+              Briefly
             </h1>
             <p className="text-gray-600 dark:text-gray-300 text-lg">
               Stay updated with the most recent headlines
@@ -109,11 +129,66 @@ export default function HomePage() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
-            Latest News
+            Briefly
           </h1>
-          <p className="text-gray-600 dark:text-gray-300 text-lg">
+          <p className="text-gray-600 dark:text-gray-300 text-lg mb-8">
             Stay updated with the most recent headlines
           </p>
+
+          {/* Search Bar */}
+          <div className="max-w-2xl mx-auto mb-8">
+            <form onSubmit={handleSearch} className="flex gap-2">
+              <div className="flex-1 relative">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search for news articles..."
+                  className="w-full px-4 py-3 pl-12 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                />
+                <svg
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </div>
+              <button
+                type="submit"
+                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              >
+                Search
+              </button>
+              {isSearching && (
+                <button
+                  type="button"
+                  onClick={handleClearSearch}
+                  className="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                >
+                  Clear
+                </button>
+              )}
+            </form>
+          </div>
+
+          {/* Search Results Header */}
+          {isSearching && (
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+                Search Results for "{searchQuery}"
+              </h2>
+              <p className="text-gray-600 dark:text-gray-300">
+                Found {articles.length} article{articles.length !== 1 ? 's' : ''}
+              </p>
+            </div>
+          )}
         </div>
         
         {/* Articles Grid */}
@@ -122,11 +197,22 @@ export default function HomePage() {
             <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 max-w-md mx-auto">
               <div className="text-gray-400 text-6xl mb-4">📰</div>
               <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">
-                No articles found
+                {isSearching ? "No articles found" : "No articles found"}
               </h3>
               <p className="text-gray-600 dark:text-gray-300">
-                Check back later for the latest news
+                {isSearching 
+                  ? `No articles found for "${searchQuery}". Try a different search term.`
+                  : "Check back later for the latest news"
+                }
               </p>
+              {isSearching && (
+                <button
+                  onClick={handleClearSearch}
+                  className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Back to Latest News
+                </button>
+              )}
             </div>
           </div>
         ) : (
@@ -139,7 +225,7 @@ export default function HomePage() {
               >
                 <article className="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden transform hover:-translate-y-2 border border-gray-100 dark:border-gray-700">
                   {/* Featured Article Badge */}
-                  {index === 0 && (
+                  {index === 0 && !isSearching && (
                     <div className="absolute top-4 left-4 z-10">
                       <span className="bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
                         FEATURED
@@ -157,7 +243,7 @@ export default function HomePage() {
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
-                        target.src = "/placeholder-news.jpg";
+                        target.src = "/placeholder-news.svg";
                       }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>

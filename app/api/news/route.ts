@@ -1,15 +1,19 @@
 import { NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const query = searchParams.get("query");
     const apiKey = process.env.NEWSAPI_API_KEY;
     
     // Try NewsAPI.org first if API key is available
     if (apiKey) {
       try {
-        const response = await fetch(
-          `https://newsapi.org/v2/top-headlines?country=us&pageSize=10&apiKey=${apiKey}`
-        );
+        const url = query 
+          ? `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&pageSize=10&apiKey=${apiKey}`
+          : `https://newsapi.org/v2/top-headlines?country=us&pageSize=10&apiKey=${apiKey}`;
+        
+        const response = await fetch(url);
         
         if (response.ok) {
           const data = await response.json();
@@ -34,9 +38,11 @@ export async function GET() {
 
     // Fallback to GNews API (free tier with full content)
     const gnewsApiKey = process.env.GNEWS_API_KEY;
-    const gnewsResponse = await fetch(
-      `https://gnews.io/api/v4/top-headlines?lang=en&country=us&max=10&apikey=${gnewsApiKey}`
-    );
+    const gnewsUrl = query 
+      ? `https://gnews.io/api/v4/search?q=${encodeURIComponent(query)}&lang=en&max=10&apikey=${gnewsApiKey}`
+      : `https://gnews.io/api/v4/top-headlines?lang=en&country=us&max=10&apikey=${gnewsApiKey}`;
+    
+    const gnewsResponse = await fetch(gnewsUrl);
     
     if (!gnewsResponse) {
       throw new Error(`HTTP error! status: 500}`);
