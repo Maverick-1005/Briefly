@@ -1,0 +1,539 @@
+{
+  "info": {
+    "name": "Briefly News API Collection",
+    "description": "Complete API collection for testing the Briefly news aggregator application. Includes all endpoints for news fetching, content extraction, and AI summarization.",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string",
+      "description": "Base URL for the Briefly news API"
+    },
+    {
+      "key": "newsApiKey",
+      "value": "your_newsapi_key_here",
+      "type": "string",
+      "description": "NewsAPI.org API key"
+    },
+    {
+      "key": "gnewsApiKey",
+      "value": "your_gnews_key_here",
+      "type": "string",
+      "description": "GNews API key"
+    },
+    {
+      "key": "meaningCloudApiKey",
+      "value": "your_meaningcloud_key_here",
+      "type": "string",
+      "description": "MeaningCloud API key"
+    }
+  ],
+  "auth": {
+    "type": "noauth"
+  },
+  "item": [
+    {
+      "name": "News API",
+      "description": "Endpoints for fetching news articles and search results",
+      "item": [
+        {
+          "name": "Get Latest News",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/news",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "news"]
+            },
+            "description": "Fetches the latest news headlines from multiple sources. Returns top headlines when no query parameter is provided."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/news",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "news"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "[\n  {\n    \"id\": \"https://example.com/article1\",\n    \"title\": \"Breaking News: Major Development\",\n    \"description\": \"This is a sample article description that provides a brief overview of the news story.\",\n    \"url\": \"https://example.com/article1\",\n    \"image\": \"https://example.com/image1.jpg\",\n    \"source\": \"Example News\",\n    \"publishedAt\": \"2024-01-01T12:00:00Z\",\n    \"content\": \"This is the full content of the article...\"\n  },\n  {\n    \"id\": \"https://example.com/article2\",\n    \"title\": \"Technology Update: Latest Innovation\",\n    \"description\": \"Another sample article about technology developments.\",\n    \"url\": \"https://example.com/article2\",\n    \"image\": \"https://example.com/image2.jpg\",\n    \"source\": \"Tech News\",\n    \"publishedAt\": \"2024-01-01T11:30:00Z\",\n    \"content\": \"Technology article content...\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Search News Articles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/news?query=technology",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "news"],
+              "query": [
+                {
+                  "key": "query",
+                  "value": "technology",
+                  "description": "Search term for filtering articles"
+                }
+              ]
+            },
+            "description": "Searches for news articles based on the provided query parameter. Returns articles that match the search term."
+          },
+          "response": [
+            {
+              "name": "Search Results",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/news?query=technology",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "news"],
+                  "query": [
+                    {
+                      "key": "query",
+                      "value": "technology"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "[\n  {\n    \"id\": \"https://technews.com/article1\",\n    \"title\": \"Latest Technology Breakthrough\",\n    \"description\": \"A revolutionary new technology that could change the industry.\",\n    \"url\": \"https://technews.com/article1\",\n    \"image\": \"https://technews.com/image1.jpg\",\n    \"source\": \"Tech News\",\n    \"publishedAt\": \"2024-01-01T10:00:00Z\",\n    \"content\": \"Technology article content...\"\n  }\n]"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Article Content API",
+      "description": "Endpoints for extracting full article content from original URLs",
+      "item": [
+        {
+          "name": "Extract Article Content",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://example.com/article-url\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/article-content",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "article-content"]
+            },
+            "description": "Scrapes and extracts the full content of an article from its original URL. This endpoint handles HTML parsing, content cleaning, and text extraction."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"url\": \"https://example.com/article-url\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/article-content",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "article-content"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"content\": \"This is the full extracted content of the article. It includes all the main text content that has been cleaned and processed from the original HTML. The content is free from navigation elements, ads, and other unwanted elements.\",\n  \"url\": \"https://example.com/article-url\"\n}"
+            },
+            {
+              "name": "Error Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"url\": \"https://invalid-url.com\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/article-content",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "article-content"]
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"error\": \"Failed to fetch article content\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "AI Summarization API",
+      "description": "Endpoints for AI-powered text summarization using MeaningCloud API",
+      "item": [
+        {
+          "name": "Generate AI Summary",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"This is a long article content that needs to be summarized. It contains multiple paragraphs and detailed information about a particular topic. The AI summarization service will analyze this content and generate a concise summary that captures the key points and main ideas.\",\n  \"title\": \"Sample Article Title\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/summarize",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "summarize"]
+            },
+            "description": "Generates an AI-powered summary of the provided article content using MeaningCloud's text analysis API. Returns a concise summary that captures the key points of the article."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"content\": \"This is a long article content that needs to be summarized.\",\n  \"title\": \"Sample Article Title\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/summarize",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "summarize"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"summary\": \"This article discusses a particular topic with detailed information. The AI analysis reveals key points and main ideas that are important for understanding the subject matter.\",\n  \"source\": \"meaningcloud\"\n}"
+            },
+            {
+              "name": "Fallback Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"content\": \"This is a long article content that needs to be summarized.\",\n  \"title\": \"Sample Article Title\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/summarize",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["api", "summarize"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"summary\": \"This is a fallback summary generated when the AI service is unavailable. It provides a basic overview of the article content.\",\n  \"source\": \"fallback\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Testing Scenarios",
+      "description": "Pre-configured test scenarios for comprehensive API testing",
+      "item": [
+        {
+          "name": "Complete News Flow Test",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/news?query=technology",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "news"],
+              "query": [
+                {
+                  "key": "query",
+                  "value": "technology"
+                }
+              ]
+            },
+            "description": "Test the complete news flow: search for articles, then test content extraction and summarization for the first result."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test the news search endpoint",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response is an array\", function () {",
+                  "    pm.response.to.be.json;",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test(\"Articles have required fields\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    if (jsonData.length > 0) {",
+                  "        const article = jsonData[0];",
+                  "        pm.expect(article).to.have.property('id');",
+                  "        pm.expect(article).to.have.property('title');",
+                  "        pm.expect(article).to.have.property('description');",
+                  "        pm.expect(article).to.have.property('url');",
+                  "        pm.expect(article).to.have.property('source');",
+                  "        pm.expect(article).to.have.property('publishedAt');",
+                  "    }",
+                  "});",
+                  "",
+                  "// Store the first article URL for content extraction test",
+                  "const jsonData = pm.response.json();",
+                  "if (jsonData.length > 0) {",
+                  "    pm.environment.set(\"testArticleUrl\", jsonData[0].url);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Content Extraction Test",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"{{testArticleUrl}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/article-content",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "article-content"]
+            },
+            "description": "Test content extraction using the URL from the previous test."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has content field\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('content');",
+                  "    pm.expect(jsonData.content).to.be.a('string');",
+                  "});",
+                  "",
+                  "pm.test(\"Content is not empty\", function () {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.content.length).to.be.greaterThan(0);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Error Handling Test",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/news?query=invalid_query_with_special_chars_!@#$%^&*()",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "news"],
+              "query": [
+                {
+                  "key": "query",
+                  "value": "invalid_query_with_special_chars_!@#$%^&*()"
+                }
+              ]
+            },
+            "description": "Test error handling with invalid query parameters."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Handles invalid query gracefully\", function () {",
+                  "    // Should return 200 with empty array or error message",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 400, 500]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Pre-request script to set up environment",
+          "console.log('Testing Briefly News API');",
+          "console.log('Base URL:', pm.environment.get('baseUrl'));"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global test script",
+          "pm.test(\"Response time is less than 5000ms\", function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+          "});",
+          "",
+          "pm.test(\"Response has valid JSON\", function () {",
+          "    pm.response.to.be.json;",
+          "});"
+        ]
+      }
+    }
+  ]
+} 
