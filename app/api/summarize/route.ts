@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
+import { GoogleGenAI } from "@google/genai";
 
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+
+// The client gets the API key from the environment variable `GEMINI_API_KEY`.
+const ai = new GoogleGenAI({});
 export async function POST(request: Request) {
   try {
     const { content, title } = await request.json();
@@ -20,45 +25,28 @@ export async function POST(request: Request) {
         .split(/[.!?]+/)
         .filter(s => s.trim().length > 20) // Only sentences with meaningful content
         .slice(0, 3); // Take first 3 sentences
-      
       return sentences.join('. ') + '.';
     };
 
-    // Try to use MeaningCloud API if API key is available
-    const apiKey = process.env.MEANINGCLOUD_API_KEY;
-    
-    if (apiKey && apiKey !== "demo") {
+    if (GEMINI_API_KEY) {
       try {
-        const summaryResponse = await fetch("https://api.meaningcloud.com/summarization-1.0", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: new URLSearchParams({
-            key: apiKey,
-            txt: content,
-            sentences: "3",
-          }),
+        const response = await ai.models.generateContent({
+          model: "gemini-2.5-flash",
+          contents: content + " Summarize this article in 3-5 concise sentences for a general audience.",
         });
+        console.log(response.text);
 
-        if (summaryResponse.ok) {
-          const summaryData = await summaryResponse.json();
-          
-          if (summaryData.summary) {
-            return NextResponse.json({
-              summary: summaryData.summary,
-              source: "meaningcloud"
-            });
-          }
-        }
+        return NextResponse.json({
+          summary: response.text,
+          source: "gemini"
+        });
       } catch (apiError) {
-        console.log("MeaningCloud API failed, using fallback:", apiError);
+        console.log("Gemini API failed, using fallback:", apiError);
       }
     }
 
     // Fallback: create a simple summary
     const summary = createSummary(content);
-    
     return NextResponse.json({
       summary,
       source: "fallback"
@@ -66,7 +54,6 @@ export async function POST(request: Request) {
 
   } catch (error) {
     console.error("Error in summarize API:", error);
-    
     return NextResponse.json(
       { 
         error: "Failed to generate summary",

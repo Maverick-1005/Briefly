@@ -18,8 +18,8 @@ export async function POST(request: Request) {
       }
     });
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch article: ${response.status}`);
+    if (!response) {
+      throw new Error(`Failed to fetch article: 500`);
     }
     console.log("added logs")
     const html = await response.text();
