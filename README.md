@@ -17,7 +17,6 @@ Experience the full functionality of Briefly - search for news, read articles wi
 
 ### 📱 Modern User Interface
 - **Responsive Design**: Optimized for desktop, tablet, and mobile devices
-- **Dark/Light Mode**: Automatic theme switching based on system preferences
 - **Smooth Animations**: Hover effects and transitions for enhanced UX
 - **Uniform Card Layout**: Consistent article card sizes with flexbox
 
