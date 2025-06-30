@@ -27,7 +27,7 @@ Experience the full functionality of Briefly - search for news, read articles wi
 - **Universal Article Access**: Search results work seamlessly with article detail pages
 
 ### 🤖 AI-Powered Content Enhancement
-- **Intelligent Summaries**: AI-generated article summaries using MeaningCloud API
+- **Intelligent Summaries**: AI-generated article summaries using Gemini (Google GenAI) API
 - **Content Extraction**: Full article content scraping from original sources
 - **Smart Fallbacks**: Multiple summarization methods for reliability
 
@@ -56,7 +56,7 @@ Experience the full functionality of Briefly - search for news, read articles wi
 - **Next.js API Routes**: Serverless API endpoints
 - **NewsAPI.org**: Primary news data source
 - **GNews API**: Secondary news source with full content
-- **MeaningCloud API**: AI-powered text summarization
+- **Gemini (Google GenAI) API**: AI-powered text summarization
 - **Axios**: HTTP client for API requests
 
 ### Development Tools
@@ -98,7 +98,7 @@ Experience the full functionality of Briefly - search for news, read articles wi
    GNEWS_API_KEY=your_gnews_key_here
    
    # AI Summarization
-   MEANINGCLOUD_API_KEY=your_meaningcloud_key_here
+   GEMINI_API_KEY=your_gemini_api_key_here
    
    # Optional: Base URL for deployment
    NEXT_PUBLIC_BASE_URL=http://localhost:3000
@@ -130,11 +130,11 @@ Experience the full functionality of Briefly - search for news, read articles wi
 - **Free tier**: 100 requests/day
 - **Features**: Full article content, multiple languages
 
-#### 3. MeaningCloud API
+#### 3. Gemini (Google GenAI) API
 - **Purpose**: AI-powered text summarization
-- **Sign up**: [https://www.meaningcloud.com/developer](https://www.meaningcloud.com/developer)
-- **Free tier**: 1,000 requests/month
-- **Features**: Intelligent text analysis and summarization
+- **Sign up**: [https://aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey)
+- **Free tier**: Generous free quota (see Google GenAI docs)
+- **Features**: Fast, high-quality text summarization
 
 ## 📁 Project Structure
 
@@ -223,14 +223,14 @@ Generates AI-powered article summaries.
 ```json
 {
   "summary": "AI-generated summary...",
-  "source": "meaningcloud"
+  "source": "gemini"
 }
 ```
 
 ## 🤖 AI Tools & Implementation
 
-### 1. MeaningCloud Text Summarization
-- **API**: MeaningCloud Summarization API
+### 1. Gemini Text Summarization
+- **API**: Gemini (Google GenAI) Summarization API
 - **Purpose**: Generate intelligent article summaries
 - **Features**: 
   - Extractive summarization
@@ -330,7 +330,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - **NewsAPI.org**: Primary news data source
 - **GNews**: Secondary news source with full content
-- **MeaningCloud**: AI-powered text analysis
+- **Gemini (Google GenAI)**: AI-powered text analysis
 - **Next.js Team**: Amazing React framework
 - **Tailwind CSS**: Utility-first CSS framework
 
@@ -343,3 +343,15 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 **Built with ❤️ using Next.js, TypeScript, and AI-powered summarization**
+
+## 🔑 Setting up Gemini (Google GenAI) API Key
+
+1. Go to the [Google AI Studio API Key page](https://aistudio.google.com/app/apikey).
+2. Sign in with your Google account and create a new API key.
+3. Copy the API key and add it to your `.env.local` file as:
+   ```env
+   GEMINI_API_KEY=your_gemini_api_key_here
+   ```
+4. Restart your development server if it's running.
+
+The app will now use Gemini (Google GenAI) for all AI-powered summaries.
