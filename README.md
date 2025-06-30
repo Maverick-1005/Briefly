@@ -60,7 +60,6 @@ Experience the full functionality of Briefly - search for news, read articles wi
 
 ### Development Tools
 - **ESLint**: Code linting and formatting
-- **Prettier**: Code formatting
 - **TypeScript**: Static type checking
 - **Next.js DevTools**: Development optimization
 
