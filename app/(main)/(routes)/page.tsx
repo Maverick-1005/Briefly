@@ -47,12 +47,17 @@ export default function HomePage() {
     }
   };
 
-  useEffect(() => {
-    if(localStorage.getItem('searchQuery') && localStorage.getItem('searchResults')) {
-      setSearchQuery(localStorage.getItem('searchQuery') || "");
-      setArticles(JSON.parse(localStorage.getItem('searchResults') || "[]"));
+  useEffect( () => {
+    const sq = localStorage.getItem('searchQuery')
+    const sr = localStorage.getItem('searchResults')
+
+    console.log("sq" , sq , "sr" , sr)
+    if(sq && sr) {
+      setSearchQuery(sq)
+      setArticles(JSON.parse(sr))
+      fetchNews(sq)
     }
-    fetchNews();
+    else fetchNews()
   }, []);
 
   const handleSearch = (e: React.FormEvent) => {
