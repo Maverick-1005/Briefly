@@ -24,7 +24,7 @@ export default function HomePage() {
         
       const response = await fetch(url);
       
-      if (!response.ok) {
+      if (!response) {
         throw new Error("Failed to fetch news articles");
       }
       
@@ -48,6 +48,10 @@ export default function HomePage() {
   };
 
   useEffect(() => {
+    if(localStorage.getItem('searchQuery') && localStorage.getItem('searchResults')) {
+      setSearchQuery(localStorage.getItem('searchQuery') || "");
+      setArticles(JSON.parse(localStorage.getItem('searchResults') || "[]"));
+    }
     fetchNews();
   }, []);
 
